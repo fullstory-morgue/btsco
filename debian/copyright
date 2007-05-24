@@ -1,0 +1,37 @@
+This package was debianized by Kel Modderman <kelrin@tpg.com.au> on
+Sun, 13 Nov 2005 10:25:06 +1000.
+
+It was downloaded from http://bluetooth-alsa.sourceforge.net/
+
+Copyright Holders: 
+
+    * Jonathan Paisley (retired from the project) started it up and wrote much of what we have now
+    * Niko Berger brought the patches forward to 2.6.7 and 2.6.8
+    * Lars Grunewaldt [largegreenwood (at) users.sourceforge.net] added some stuff to the userspace daemon and is working on mode change hooks
+    * Marcel Holtmann has always been the key developer for bluez and has recently jumped in and helped a lot with our project specifically
+    * Henryk Ploetz donated SBC manipulation code and brings a significant understanding of this codec
+    * Brad Midgley is doing documentation, A2DP protocols, vendor relations, and project coordination
+    * Fredrik Tolf has been fixing up daemon/userspace interactions
+    * Mayank Batra contributed a2recv.c for A2DP sink support
+    * Victor Shcherbatyuk added fixed-point A2DP encoding including Arm optimizations
+    * Andreas Beck gave us the script in contrib for skype and is working on automatic mic gain and fixing noise 
+
+License:
+
+   This package is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This package is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this package; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+On Debian systems, the complete text of the GNU General
+Public License can be found in `/usr/share/common-licenses/GPL'.
+

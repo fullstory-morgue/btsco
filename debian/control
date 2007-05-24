@@ -1,0 +1,31 @@
+Source: btsco
+Section: misc
+Priority: optional
+Maintainer: Russell Stuart <russell-debian@stuart.id.au>
+Uploaders: Kel Modderman <kelrin@tpg.com.au>
+Build-Depends: cdbs, debhelper (>= 5.0.37), dpatch, autotools-dev, libasound2-dev, libbluetooth-dev, bzip2
+Standards-Version: 3.7.2
+
+Package: btsco
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: use a bluetooth headset with Linux
+ This project provides a way to use a bluetooth headset with Linux. We do this
+ currently by making an alsa kernel driver which uses bluez to reach the
+ headset. It works well enough now to get voice-quality audio to and from most
+ headsets.
+ .
+ We have code to make a headset connection (using the btsco daemon) to send 
+ audio through the alsa system and we have separate code to send stereo audio 
+ to the a2dp device using a userspace program (a2play). Only a couple of 
+ headsets can accept stereo audio so try the btsco stuff first.
+
+Package: btsco-source
+Architecture: all
+Depends: debhelper (>= 4.2), module-assistant, bzip2
+Description: source code for the btsco kernel module
+ The btsco module is a alsa kernel driver which uses bluez to reach the 
+ bluetooth headset.
+ .
+ This package provides the source code for the btsco kernel modules.
+ Kernel source or headers are required to compile these modules.

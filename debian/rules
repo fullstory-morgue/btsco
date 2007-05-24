@@ -1,0 +1,31 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/autotools.mk
+include /usr/share/cdbs/1/rules/dpatch.mk
+
+install/btsco::
+	for b in a2play a2recv btsco btsco2; do \
+		install -m 0755 $$b \
+			debian/btsco/usr/bin/; \
+	done
+
+install/btsco-source::
+	# Enforce executable bit on debian/rules, and create
+	# directory structure for modules source
+	install -D -m 0755 debian/rules.modules \
+                debian/tmp/modules/btsco/debian/rules
+	
+	# Prepare the other debian stuff
+	for f in *.modules.in control compat  copyright changelog; do \
+		install -m 0644 debian/$$f \
+			debian/tmp/modules/btsco/debian/; \
+	done
+	
+	# Prepare upstream source
+	install -m 0644 kernel/* \
+		debian/tmp/modules/btsco/
+	
+	# Prepare the debian source tarball
+	tar jcf debian/btsco-source/usr/src/btsco.tar.bz2 \
+		-C debian/tmp modules

@@ -1,0 +1,33 @@
+btsco (0.42-3) unstable; urgency=low
+
+  * Add manpages for btsco tools from Michael Prokop <mika@grml.org>.
+  * Clean up debian/rules.
+  * Bump debhelper compat level to 5.
+
+ -- Kel Modderman <kelrin@tpg.com.au>  Wed, 30 Aug 2006 15:07:05 +1000
+
+btsco (0.42-2) unstable; urgency=low
+
+  * Changed maintainers.
+  * Now uses dpatch.
+
+ -- Russell Stuart <russell-debian@stuart.id.au>  Fri, 28 Jul 2006 10:16:30 +1000
+
+btsco (0.42-1) unstable; urgency=low
+
+  * New Upstream release.
+
+ -- Russell Stuart <russell-debian@stuart.id.au>  Wed, 10 May 2006 13:15:29 +1000
+
+btsco (0.41) unstable; urgency=low
+
+  * New Upstream release.
+
+ -- Russell Stuart <russell-debian@stuart.id.au>  Mon, 30 Jan 2006 14:16:25 +1000
+
+btsco (0.3+cvs20051113-1) unstable; urgency=low
+
+  * Initial release
+
+ -- Kel Modderman <kelrin@tpg.com.au>  Sun, 13 Nov 2005 10:25:06 +1000
+

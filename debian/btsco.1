@@ -1,0 +1,45 @@
+.TH BTSCO 1 "February 18, 2006"
+.SH NAME
+btsco \- bluetooth audio handler
+.SH SYNOPSIS
+.B btsco
+.RI [ options ] " <bdaddr>" " [channel]"
+.SH DESCRIPTION
+This manual page documents briefly the
+.B btsco
+command.
+.PP
+.SH OPTIONS
+A summary of options is included below.
+Notice: The headset channel will be automatically detected if not specified.
+.TP
+.B \-h
+Show summary of options.
+.TP
+.B \-v
+Print verbose output.
+.TP
+.B \-r
+Automatically reconnect upon lost rfcomm channel.
+.TP
+.B \-f
+Fork and run as a daemon.
+.TP
+.B \-c
+Clear filehandle and exit.
+.TP
+.B \-s
+Indicate status by creating the file /tmp/bt_headset_connected.
+.TP
+.B \-i hciX
+Use interface hciX.
+.SH SEE ALSO
+.BR btsco2 (1),
+.BR a2play (1),
+.BR a2rec (1).
+.br
+.SH AUTHOR
+btsco was written by the Bluetoot-Alsa Team (see http://bluetooth-alsa.sourceforge.net/).
+.PP
+This manual page was written by Michael Prokop <mika@grml.org>,
+for the Debian project (but may be used by others).

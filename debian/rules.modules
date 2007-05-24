@@ -1,0 +1,42 @@
+#!/usr/bin/make -f
+
+# prefix of the target package name
+PACKAGE=btsco-modules
+MA_DIR ?= /usr/share/modass
+-include $(MA_DIR)/include/generic.make
+-include $(MA_DIR)/include/common-rules.make
+
+.PHONY: kdist_config
+kdist_config: prep-deb-files
+
+.PHONY: binary_modules binary-modules
+binary-modules: binary_modules
+binary-modules: kdist_config
+	dh_testroot
+	dh_clean -k
+	
+	# Build the module
+	$(MAKE) -C $(CURDIR) KSRC=$(KSRC) default
+	
+	# Install the module
+	dh_installdirs			lib/modules/$(KVERS)/misc
+	dh_install snd-bt-sco.ko	lib/modules/$(KVERS)/misc
+	
+	dh_installdocs
+	dh_installchangelogs
+	dh_installmodules
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol -- -v$(VERSION)
+	dh_md5sums
+	dh_builddeb --destdir=$(DEB_DESTDIR)
+	dh_clean -k
+
+.PHONY: kdist_clean
+kdist_clean: modules-clean
+modules-clean:
+	dh_testdir
+	dh_testroot
+	dh_clean
+	rm -f *.*o *.mod.* Modules.symvers

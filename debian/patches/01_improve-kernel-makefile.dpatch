@@ -1,0 +1,31 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 01_improve-kernel-makefile.dpatch by Kel Modderman <kelrin@tpg.com.au>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Ensure module makefile can build for kernels other than `uname -r`
+
+@DPATCH@
+diff -Nrup btsco-0.42.orig/kernel/Makefile btsco-0.42/kernel/Makefile
+--- btsco-0.42.orig/kernel/Makefile	2005-06-18 01:57:43.000000000 +1000
++++ btsco-0.42/kernel/Makefile	2006-07-27 19:26:19.000000000 +1000
+@@ -1,3 +1,6 @@
++KSRC ?= /lib/modules/`uname -r`/build
++PWD ?= `pwd`
++
+ obj-m += snd-bt-sco.o
+ 
+ snd-bt-sco-objs := btsco.o
+@@ -10,10 +13,10 @@ endif
+ 
+ 
+ default:
+-	@make -C /lib/modules/`uname -r`/build M=`pwd` modules
++	@make -C $(KSRC) M=$(PWD) modules
+ 
+ install:
+-	@make -C /lib/modules/`uname -r`/build M=`pwd` modules_install
++	@make -C $(KSRC) M=$(PWD) modules_install
+ 
+ clean:
+-	@make -C /lib/modules/`uname -r`/build M=`pwd` clean
++	@make -C $(KSRC) M=$(PWD) clean

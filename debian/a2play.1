@@ -1,0 +1,51 @@
+.TH A2PLAY 1 "February 18, 2006"
+.SH NAME
+a2play \- send stereo audio to an a2dp device
+.SH SYNOPSIS
+.B a2play
+.RI [ options ] " <bdaddr>" " [filename]"
+.SH DESCRIPTION
+This manual page documents briefly the
+.B a2play
+command.
+.PP
+.SH OPTIONS
+A summary of options is included below.
+Notice: The headset channel will be automatically detected if not specified.
+.TP
+.B \-h
+Show summary of options.
+.TP
+.B \-v
+Print verbose output.
+.TP
+.B \-n
+Send packets as fast as they are encoded instead of timing them.
+.TP
+.B \-p
+Use pthreads and rtc for packet timing.
+.TP
+.B \-t
+Thrifty (repeat for very thrifty).
+.TP
+.B \-d
+Process input as raw audio or an audio device.
+.TP
+.B \-m
+Use mono instead of the default stereo; implies -d.
+.TP
+.B \-s
+Skip over backlogged data to try to eliminate latency.
+.TP
+.B \-r rate
+Use rate, default 44100, for raw audio or device; implies -d.
+.SH SEE ALSO
+.BR btsco (1),
+.BR btsco2 (1),
+.BR a2rec (1).
+.br
+.SH AUTHOR
+a2play was written by the Bluetoot-Alsa Team (see http://bluetooth-alsa.sourceforge.net/).
+.PP
+This manual page was written by Michael Prokop <mika@grml.org>,
+for the Debian project (but may be used by others).

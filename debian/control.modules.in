@@ -1,0 +1,22 @@
+Source: btsco
+Section: contrib/net
+Priority: optional
+Maintainer: Russell Stuart <russell-debian@stuart.id.au>
+Uploaders: Kel Modderman <kelrin@tpg.com.au>
+Build-Depends: debhelper (>= 5.0.37), bzip2
+Standards-Version: 3.7.2
+
+Package: btsco-modules-_KVERS_
+Architecture: any
+Depends: btsco
+Provides: btsco-modules
+Description: btsco modules for Linux (kernel _KVERS_)
+ This package contains the set of loadable kernel modules for the
+ btsco bluetooth driver for linux.
+ .
+ This package contains the compiled kernel modules for _KVERS_
+ .
+ If you have compiled your own kernel, you will most likely need to build
+ your own btsco-modules. The btsco-source package has been
+ provided for use with the Debian's module-assistant or kernel-package
+ utilities to produce a version of btsco-modules for your kernel.
