@@ -1,0 +1,250 @@
+
+                            Bluetooth-alsa Project
+
+   This project provides a way to use a bluetooth headset with Linux. We
+   do this currently by making an alsa kernel driver which uses bluez to
+   reach the headset. It works well enough now to get voice-quality audio
+   to and from most headsets. We've had success with:
+     * BlueTrek 1, G2
+     * Bluetake iPhono BT420 (using either sco or a2dp)
+     * Canyon CN-BTH1 (must click headset's volume-up button after each
+       connection)
+     * Ericsson HBH-60, HBH-35
+     * Ericsson HBH-PV700 (headset may go silent after a few minutes)
+     * iTech Clip S (using either sco or a2dp)
+     * Jabra BT110, BT130, BT200, BT250
+     * Jabra Mega BT (use -r option to reconnect rfcomm channel whenever
+       it's lost)
+     * LevelOne BLH-1000 (occasional noisy connections)
+     * Logitech HS01 (has a noisy microphone?)
+     * Logitech Mobile F-0179A, Mobile F-0228A
+     * Motorola HS801 (volume must be changed from headset?)
+     * Motorola HS805 (had to uncomment "auth enable" in
+       /etc/bluetooth/hcid.conf and restart first)
+     * Motorola HS810/HS850 (may work "better" if you manually specify
+       the handsfree channel, 8)
+     * Motorola HT820 (for both sco and stereo; sound crackles a bit)
+     * Nokia HDW-2, HDW-3, hs-11w
+     * Plantronics M2500
+     * Siemens HHB-600
+
+   We currently don't have any code to make the connection to an audio
+   gateway (typically a cellphone). There's a [1]project associated with
+   asterisk and a [2]standalone app for using a cellphone.
+
+  Features
+
+   We have code to make a headset connection (using the btsco daemon) to
+   send audio through the alsa system and we have separate code to send
+   stereo audio to the a2dp device using a userspace program (a2play).
+   Only a couple of headsets can accept stereo audio so try the btsco
+   stuff first.
+
+  Build
+
+    1. Install or update the required packages:
+          + automake-1.7
+          + libbluetooth-dev (aka libbluetooth-devel or bluetooth-devel
+            or bluez-libs)
+          + libasound2-dev (aka alsa-devel)
+          + a recent (2.6.11.7 or newer) kernel with *integrated* alsa
+            enabled (it won't work with the "standalone" alsa drivers
+            that are a separate download from the kernel)
+    2. Check btsco out from cvs:
+        cvs -d:pserver:anonymous@cvs.sf.net:/cvsroot/bluetooth-alsa login
+        cvs -d:pserver:anonymous@cvs.sf.net:/cvsroot/bluetooth-alsa co btsco
+    3. Compile:
+        ./bootstrap
+        ./configure
+        make
+        make install
+        make maintainer-clean
+    4. For SCO (two-way voice quality audio) you need a kernel with the
+       emu10k1 driver selected (this is one of the drivers that forces
+       the inclusion of the implementation of "snd_hwdep_new"). Build the
+       kernel module:
+        cd kernel
+        make
+        make install
+        depmod -e
+        make clean
+
+  Using SCO audio
+
+    1. insert the module (or better, set up the alsa configuration to
+       load it)
+        modprobe snd_bt_sco
+    2. stop the esound controller if it's running via
+        esdctl stop
+    3. run
+        hciconfig hci0 voice 0x0060
+    4. turn on the headset (you may need to prepare the headset to be
+       paired the computer, usually by turning on the headset and holding
+       the on button until it beeps; make sure the headset has not
+       connected to your cell--this would block the computer's
+       connection.)
+    5. run the handler (let it keep running if you run in the foreground)
+        btsco bdaddress
+    6. You probably need to enter the passkey if it's the first time
+       'round
+    7. send and receive audio from the headset (usually using /dev/dsp1)
+       or via the alsa device with something like
+        aplay -B 1000000 -D plughw:Headset sound.wav
+
+   Right now the daemon interaction is somewhat limited:
+     * Put alternating lines of regexes and shell commands in ~/.btscorc
+       and when something that the headset sends matches these regexes,
+       the shell command is run (with any back references \0 \1 etc
+       replaced from the regexp, \s replaced by the link state and \p
+       replaced by the daemon's pid). This, of course, is primarily
+       intended to "do stuff" when the headset button(s) are pressed.
+     * Send SIGHUP to the userspace program to make it re-read the config
+       file.
+     * Send SIGUSR1 to the userspace program to make the headset ring.
+     * Send SIGUSR2 to the userspace program to force a headset
+       reconnect.
+
+   Andreas Beck contributed a .btscorc and skype script for making the
+   headset button answer an incoming call. It's in our contrib/ dir and
+   he may have updates [3]here.
+
+  Stereo (A2DP) Streaming
+
+   A2DP provides a way to send stereo high-quality audio to some of the
+   newer headsets. On all the headsets I've seen so far, this is one-way
+   audio, so if you were expecting to get something like a gaming headset
+   (talking to other players, getting stereo sound back from the game),
+   you should wait for the next generation of headsets to get 2-way A2DP.
+
+   Right now A2DP transmission requires a helper app to bring in audio.
+   Hopefully we can remove this requirement. From the btsco directory
+   after a successful make:
+        mpg123 --au - file.mp3 | ./a2play 00:0D:3C:30:32:AD
+
+   Where you replace file.mp3 with a good mp3 file and bdaddr with the
+   address of your headset. If you have trouble with using a2play, let us
+   know on the mailing list if this works for you instead:
+        mpg123 --au - file.mp3 | sbc/sbcenc - | ./sbc/rcplay 00:0D:3C:30:32:AD
+-
+
+   You can send live audio from line-in etc using a command like:
+        ./a2play -s -d -r 44100 00:0D:3C:30:32:AD /dev/dsp
+
+   Don't be surprised to get a delay. It's probably under 500ms but not
+   much under that.
+
+   The A2DP sink code receives a stream from another device. Run it with:
+        hciconfig hci0 class 0x200404
+        sdptool add A2SNK
+        ./a2recv
+
+   It will try to bind to the bluetooth adapter and send audio out to
+   /dev/dsp.
+
+  Embedded status
+
+   The status of work on gumstix/xscale is on its [4]own page.
+
+  A2DP userspace plugin
+
+   If you want to experiment with the alsa userspace plugin work, go to
+   the directory 'alsa-plugins' in the cvs archive and have a look at the
+   BUILD docs there. This lets you have alsa clients such as xmms send
+   audio directly to an a2dp headset.
+
+  Links
+
+     * [5]Bug list at sourceforge
+     * [6]Bluez main page
+
+  Discussion
+
+   This code is experimental, so the best place to talk about it and
+   submit changes is on the bluez-devel mailing list.
+
+   If things aren't working as you expect, some of the things that can
+   help us track it down are:
+     * Whether there is a hub between your computer and bluetooth adapter
+       (you should avoid this [7]especially if it's a usb 2.0 hub)
+     * Manufacturer and model of headset and bluetooth adapter
+     * Output from hciconfig -a
+     * Output from hciconfig hci0 revision (Run hciconfig as root) 
+          + If it prints "SCO mapping: HCI" then your adapter should
+            work.
+          + If it prints "SCO mapping: PCM" then you might permanently
+            change the setting using a command like "pskey mapsco 0"
+            using bluez-utils-cvs but this is at your own risk.
+          + If it doesn't print either of those, you probably need a
+            different bluetooth adapter (preferably "CSR" based). You
+            might be able to get a broadcom adapter to work if you apply
+            a [8]patch to force sco mtu values (eg works for F8T012; let
+            us know how it works on bluez-devel!)
+     * Output from hcitool info bdaddr where bdaddr is the headset's
+       address
+     * Output from hcidump -X while running btsco or a2play if
+       appropriate
+     * The output btsco -v or a2play prints to the screen
+     * Your kernel version and bluez userland versions or distro
+     * Result when trying it with a recent kernel if possible (eg 2.6.11)
+     * If you have a headset that can do a2dp, try both btsco and a2play
+       (the significance is that the latter does not use SCO)
+     * If you can try another bluetooth adapter or headset, let us know
+       if that helps (the adapters are cheap now, eh? :)
+     * If you can't pair or connect with the headset, did you pair it
+       with another device? Did it help to reset the pairing by removing
+       /etc/bluetooth/link_key or
+       /var/lib/bluetooth/[dongleaddr]/linkkeys or by putting the headset
+       in pair mode? You may have to redo this often if you try to
+       dual-boot windows or if you use the same dongle on another
+       computer. Be sure to set "auth disable" and "encrypt disable" in
+       /etc/bluetooth/hcid.conf.
+
+  Credits
+
+   Some instrumental people in this effort:
+     * [9]Jonathan Paisley (retired from the project) started it up and
+       wrote much of what we have now
+     * [10]Niko Berger brought the patches forward to 2.6.7 and 2.6.8
+     * [11]Lars Grunewaldt (also retired) added some stuff to the
+       userspace daemon
+     * [12]Marcel Holtmann has always been the key developer for bluez
+       and has recently jumped in and helped a lot with our project
+       specifically
+     * Henryk Ploetz completed the first SBC codec
+     * [13]Brad Midgley is doing documentation, A2DP protocols, vendor
+       relations, and project coordination
+     * Fredrik Tolf has been fixing up daemon/userspace interactions
+     * Mayank Batra contributed a2recv.c for A2DP sink support
+     * Victor Shcherbatyuk added fixed-point A2DP encoding including Arm
+       optimizations
+     * Andreas Beck gave us the script in contrib for skype and is
+       working on automatic mic gain and fixing noise
+
+  Our Sponsors
+
+   [14][gumstix.gif] 
+
+   Gumstix provides brilliant embedable xscale boards with bluetooth
+   [15]SourceForge.net Logo 
+     _________________________________________________________________
+
+   The [16]bluetooth-alsa project pages
+
+References
+
+   1. http://www.crazygreek.co.uk/content/chan_bluetooth
+   2. http://www.soft.uni-linz.ac.at/_wiki/tiki-index.php?page=ProjectBluezHandsfree
+   3. http://www.acs.uni-duesseldorf.de/~becka/download/skype/
+   4. http://bluetooth-alsa.sourceforge.net/embed.html
+   5. http://sourceforge.net/tracker/?group_id=116589&atid=678258
+   6. http://www.bluez.org/
+   7. http://sourceforge.net/mailarchive/message.php?msg_id=11431438
+   8. http://bluetooth-alsa.sourceforge.net/sco-mtu.patch
+   9. http://www.dcs.gla.ac.uk/~jp
+  10. http://www.gargan.org/
+  11. http://www.dark-reality.de/
+  12. http://www.holtmann.org/linux/bluetooth/
+  13. http://www.xmission.com/~bmidgley/
+  14. http://www.gumstix.com/
+  15. http://sourceforge.net/
+  16. http://sourceforge.net/projects/bluetooth-alsa/
